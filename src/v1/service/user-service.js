@@ -9,6 +9,7 @@ import {prismaClient} from "../../application/database.js";
 import {ResponseError} from "../../error/response-error.js";
 import bcrypt from "bcrypt";
 import {v4 as uuid} from "uuid";
+import {request} from "express";
 
 const register = async (request) => {
     const user = validate(registerUserValidation, request);
@@ -157,10 +158,38 @@ const logout = async (username) => {
     });
 };
 
+const createAdmin = async (request) => {
+    const user = validate(registerUserValidation, request);
+
+    const countUser = await prismaClient.user.count({
+        where: {
+            username: user.username
+        }
+    });
+
+    if (countUser === 1) {
+        throw new ResponseError(400, "Username already exist");
+    }
+
+    user.role = 'admin';
+    user.password = await bcrypt.hash(user.password, 10);
+
+    return prismaClient.user.create({
+        data: user,
+        select: {
+            username: true,
+            name: true,
+            email: true,
+            role: true,
+        }
+    })
+}
+
 export default {
     register,
     login,
     get,
     update,
     logout,
+    createAdmin,
 }

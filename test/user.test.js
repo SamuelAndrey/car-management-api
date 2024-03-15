@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import {web} from "../src/application/web.js";
 import {logger} from "../src/application/logging.js";
-import {createTestUser, getTestUser, removeTestUser} from "./test-utils.js";
+import {createTestUser, createTestUserSuperAdmin, getTestUser, removeTestUser} from "./test-utils.js";
 import bcrypt from "bcrypt";
 
 describe('POST /api/v1/users', function () {
@@ -268,5 +268,94 @@ describe('DELETE /api/v1/users/logout', function () {
 
         const user = await getTestUser();
         expect(user.token).toBeNull();
+    });
+});
+
+describe('POST /api/v1/users/admin', function () {
+
+    beforeEach(async () => {
+        await createTestUser();
+        await createTestUserSuperAdmin();
+    });
+
+    afterEach(async () => {
+        await removeTestUser();
+    });
+
+    it('should can create new admin', async () => {
+        const result = await supertest(web)
+            .post('/api/v1/users/admin')
+            .set('Authorization', 'super-admin-token')
+            .send({
+                username: "admin",
+                password: "secret",
+                name: "admin",
+                email: "admin@localhost.com"
+            });
+
+        expect(result.status).toBe(201);
+        expect(result.body.data.username).toBe("admin");
+        expect(result.body.data.name).toBe("admin");
+        expect(result.body.data.role).toBe("admin");
+        expect(result.body.data.password).toBeUndefined();
+    });
+
+    it('should reject if role not super admin', async () => {
+        const result = await supertest(web)
+            .post('/api/v1/users/admin')
+            .set('Authorization', 'test')
+            .send({
+                username: "admin",
+                password: "secret",
+                name: "admin",
+                email: "admin@localhost.com"
+            });
+
+        expect(result.status).toBe(401);
+    });
+
+    it('should reject if request invalid', async () => {
+        const result = await supertest(web)
+            .post('/api/v1/users/admin')
+            .set('Authorization', 'super-admin-token')
+            .send({
+                username: "",
+                password: "",
+                name: "test"
+            });
+
+        expect(result.status).toBe(400);
+        expect(result.body.errors).toBeDefined();
+    });
+
+    it('should reject if username already registered', async () => {
+        let result = await supertest(web)
+            .post('/api/v1/users/admin')
+            .set('Authorization', 'super-admin-token')
+            .send({
+                username: "admin",
+                password: "secret",
+                name: "admin",
+                email: "admin@localhost.com"
+            });
+
+        expect(result.status).toBe(201);
+        expect(result.body.data.username).toBe("admin");
+        expect(result.body.data.name).toBe("admin");
+        expect(result.body.data.role).toBe("admin");
+        expect(result.body.data.password).toBeUndefined();
+
+        result = await supertest(web)
+            .post('/api/v1/users/admin')
+            .set('Authorization', 'super-admin-token')
+            .send({
+                username: "admin",
+                password: "secret",
+                name: "admin",
+                email: "admin@localhost.com"
+            });
+
+        expect(result.status).toBe(400);
+        expect(result.body.errors).toBeDefined();
     });
 });
