@@ -7,7 +7,7 @@ const removeTestUser = async () => {
             username: "test"
         }
     })
-}
+};
 
 const createTestUser = async () => {
     await prismaClient.user.create({
@@ -19,9 +19,18 @@ const createTestUser = async () => {
             token: "test"
         }
     })
-}
+};
+
+const getTestUser = async () => {
+    return prismaClient.user.findUnique({
+        where: {
+            username: "test"
+        }
+    })
+};
 
 export {
     removeTestUser,
     createTestUser,
+    getTestUser,
 }
