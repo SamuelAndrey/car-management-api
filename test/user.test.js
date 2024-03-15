@@ -137,7 +137,7 @@ describe('POST /api/v1/users/login', function () {
         expect(result.status).toBe(401);
         expect(result.body.errors).toBeDefined();
     });
-})
+});
 
 describe('GET /api/v1/user/current', function () {
     beforeEach(async () => {
@@ -246,5 +246,27 @@ describe('PATCH /api/v1/users/current', function () {
             .send({});
 
         expect(result.status).toBe(401);
+    });
+});
+
+describe('DELETE /api/v1/users/logout', function () {
+    beforeEach(async () => {
+        await createTestUser();
+    });
+
+    afterEach(async () => {
+        await removeTestUser();
+    });
+
+    it('should can logout', async () => {
+        const result = await supertest(web)
+            .delete("/api/v1/users/logout")
+            .set("Authorization", "test");
+
+        expect(result.status).toBe(200);
+        expect(result.body.data).toBe("OK");
+
+        const user = await getTestUser();
+        expect(user.token).toBeNull();
     });
 });
