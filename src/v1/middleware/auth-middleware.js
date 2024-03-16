@@ -1,12 +1,25 @@
-import {prismaClient} from "../../application/database.js";
+import { prismaClient } from "../../application/database.js";
 
-export const authMiddleware = async (req, res, next) => {
-    const token = req.get("Authorization");
+const handleUnauthorized = (res) => {
+    res.status(401).json({
+        errors: "Unauthorized"
+    }).end();
+};
+
+const isUser = (user, req, res, next) => {
+    if (!user) {
+        handleUnauthorized(res);
+    } else {
+        req.user = user;
+        next();
+    }
+}
+
+export const authMiddleware = async (request, response, next) => {
+    const token = request.get("Authorization");
 
     if (!token) {
-        res.status(401).json({
-            errors: "Unauthorized"
-        }).end();
+        handleUnauthorized(response);
     } else {
         const user = await prismaClient.user.findFirst({
             where: {
@@ -14,13 +27,43 @@ export const authMiddleware = async (req, res, next) => {
             }
         });
 
-        if (!user) {
-            res.status(401).json({
-                errors: "Unauthorized"
-            }).end();
-        } else {
-            req.user = user;
-            next();
-        }
+        isUser(user, request, response, next);
     }
-}
+};
+
+export const isSuperAdminMiddleware = async (request, response, next) => {
+    const token = request.get("Authorization");
+
+    if (!token) {
+        handleUnauthorized(response);
+    } else {
+        const user = await prismaClient.user.findFirst({
+            where: {
+                token: token,
+                role: 'superadmin'
+            }
+        });
+
+        isUser(user, request, response, next);
+    }
+};
+
+export const isAdminOrSuperAdminMiddleware = async (request, response, next) => {
+    const token = request.get("Authorization");
+
+    if (!token) {
+        handleUnauthorized(response);
+    } else {
+        const user = await prismaClient.user.findFirst({
+            where: {
+                token: token,
+                OR: [
+                    { role: "superadmin" },
+                    { role: "admin" }
+                ]
+            }
+        });
+
+        isUser(user, request, response, next);
+    }
+};
