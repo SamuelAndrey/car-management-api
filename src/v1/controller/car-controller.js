@@ -18,6 +18,29 @@ const create = async (req, res, next) => {
     }
 };
 
+const list = async (req, res, next) => {
+    try {
+        const cars = await carService.list();
+        const formattedCars = cars.map(car => {
+            return {
+                id: car.id,
+                name: car.name,
+                cost_per_day: car.cost_per_day,
+                size: car.size,
+                image: req.protocol + '://' + req.get('host') + car.image,
+                updated_at: car.updated_at
+            }
+        });
+        res.status(200).json({
+            data: formattedCars
+        });
+    } catch (e) {
+        next(e);
+    }
+}
+
+
 export default {
     create,
+    list,
 }

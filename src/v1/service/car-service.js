@@ -21,7 +21,21 @@ const create = async (request) => {
     });
 };
 
+const list = async () => {
+    return prismaClient.car.findMany({
+        select: {
+            id: true,
+            name: true,
+            cost_per_day: true,
+            size: true,
+            image: true,
+            updated_at: true,
+        }
+    });
+};
+
 
 export default {
     create,
+    list
 }
