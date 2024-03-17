@@ -27,7 +27,7 @@ model User {
 model Car {
   id           Int      @id @default(autoincrement())
   name         String   @db.VarChar(255)
-  cost_per_day BigInt   @db.BigInt
+  cost_per_day Int      @db.Int
   size         String   @db.VarChar(100)
   image        String   @db.VarChar(100)
   updated_at   DateTime @updatedAt
