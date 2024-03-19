@@ -2,6 +2,7 @@ import carService from "../service/car-service.js";
 import fs from "fs";
 import path from "path";
 import {uploadDirectory} from "../middleware/upload-middleware.js";
+import {logger} from "../../application/logging.js";
 
 const create = async (req, res, next) => {
     try {
@@ -9,6 +10,21 @@ const create = async (req, res, next) => {
         res.status(201).json({
             data: result
         })
+    } catch (e) {
+        if (req.file) {
+            const filePath = path.join(uploadDirectory, req.file.filename);
+            fs.unlinkSync(filePath);
+        }
+        next(e);
+    }
+};
+
+const update = async (req, res, next) => {
+    try {
+        const result = await carService.update(req);
+        res.status(201).json({
+            data: result
+        });
     } catch (e) {
         if (req.file) {
             const filePath = path.join(uploadDirectory, req.file.filename);
@@ -37,10 +53,23 @@ const list = async (req, res, next) => {
     } catch (e) {
         next(e);
     }
+};
+
+const remove = async (req, res, next) => {
+    try {
+        await carService.remove(req.params.carId);
+        res.status(200).json({
+            data: "OK"
+        });
+    } catch (e) {
+        next(e);
+    }
 }
 
 
 export default {
     create,
     list,
+    update,
+    remove,
 }

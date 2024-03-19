@@ -1,6 +1,20 @@
 import {validate} from "../validation/validation.js";
-import {createCarValidation} from "../validation/car-validation.js";
+import {createCarValidation, getCarValidation, updateCarValidation} from "../validation/car-validation.js";
 import {prismaClient} from "../../application/database.js";
+import {ResponseError} from "../../error/response-error.js";
+import path from "path";
+import {uploadDirectory} from "../middleware/upload-middleware.js";
+import fs from "fs";
+
+const removeImageFromDirectory = (fileName) => {
+    const filteredImageUrl = fileName.replace('/public/uploads/', '');
+    const filePath = path.join(uploadDirectory, filteredImageUrl);
+
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+    }
+}
+
 
 const create = async (request) => {
     const car = validate(createCarValidation, request.body);
@@ -34,8 +48,68 @@ const list = async () => {
     });
 };
 
+const update = async (request) => {
+    const car = validate(updateCarValidation, request.body);
+
+    car.cost_per_day = parseInt(car.cost_per_day);
+
+    const carInDatabase = await prismaClient.car.findFirst({
+        where: {
+            id: car.id,
+        },
+    });
+
+    if (!carInDatabase) {
+        throw new ResponseError(404, "car is not found");
+    }
+
+    const data = { ...car };
+
+    if (request.file) {
+        removeImageFromDirectory(carInDatabase.image);
+        data.image = '/public/uploads/' + request.file.filename;
+    }
+
+    return prismaClient.car.update({
+        where: {
+            id: car.id,
+        },
+        data: data,
+        select: {
+            id: true,
+            name: true,
+            cost_per_day: true,
+            size: true,
+            image: true
+        }
+    });
+};
+
+const remove = async (carId) => {
+    carId = validate(getCarValidation, carId);
+    const carInDatabase = await prismaClient.car.findFirst({
+        where: {
+            id: carId,
+        },
+    });
+
+    if (!carInDatabase) {
+        throw new ResponseError(404, "car is not found");
+    }
+
+    removeImageFromDirectory(carInDatabase.image);
+
+    return prismaClient.car.delete({
+        where: {
+            id: carId
+        }
+    });
+}
+
 
 export default {
     create,
-    list
+    list,
+    update,
+    remove,
 }

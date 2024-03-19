@@ -20,6 +20,8 @@ userRouter.post("/api/v1/users/admin", isSuperAdminMiddleware, userController.cr
 // car router
 userRouter.post("/api/v1/cars", upload.single("file"), carController.create);
 userRouter.get("/api/v1/cars", carController.list);
+userRouter.put("/api/v1/cars", upload.single("file"), carController.update);
+userRouter.delete("/api/v1/cars/:carId", carController.remove);
 
 export {
     userRouter,
