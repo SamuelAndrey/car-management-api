@@ -3,10 +3,10 @@ import {
     authMiddleware,
     isAdminOrSuperAdminMiddleware,
     isSuperAdminMiddleware
-} from "../v1/middleware/auth-middleware.js";
-import userController from "../v1/controller/user-controller.js";
-import carController from "../v1/controller/car-controller.js";
-import {upload} from "../v1/middleware/upload-middleware.js";
+} from "../../middleware/v1/auth-middleware.js";
+import userController from "../../controller/v1/user-controller.js";
+import carController from "../../controller/v1/car-controller.js";
+import {upload} from "../../middleware/v1/upload-middleware.js";
 
 const userRouter = express.Router();
 // userRouter.use(authMiddleware);
@@ -22,6 +22,7 @@ userRouter.post("/api/v1/cars", upload.single("file"), carController.create);
 userRouter.get("/api/v1/cars", carController.list);
 userRouter.put("/api/v1/cars", upload.single("file"), carController.update);
 userRouter.delete("/api/v1/cars/:carId", carController.remove);
+userRouter.get("/api/v1/cars/:carId", carController.get);
 
 export {
     userRouter,

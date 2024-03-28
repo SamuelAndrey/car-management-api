@@ -1,8 +1,8 @@
 import express from "express";
-import {publicRouter} from "../route/public-api.js";
-import {userRouter} from "../route/api.js";
-import {errorMiddleware} from "../v1/middleware/error-middleware.js";
-import {uploadDirectory} from "../v1/middleware/upload-middleware.js";
+import {publicRouter} from "../route/v1/public-api.js";
+import {userRouter} from "../route/v1/api.js";
+import {errorMiddleware} from "../middleware/v1/error-middleware.js";
+import {uploadDirectory} from "../middleware/v1/upload-middleware.js";
 
 export const web = express();
 

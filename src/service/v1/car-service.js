@@ -1,9 +1,9 @@
-import {validate} from "../validation/validation.js";
-import {createCarValidation, getCarValidation, updateCarValidation} from "../validation/car-validation.js";
+import {validate} from "../../validation/v1/validation.js";
+import {createCarValidation, getCarValidation, updateCarValidation} from "../../validation/v1/car-validation.js";
 import {prismaClient} from "../../application/database.js";
 import {ResponseError} from "../../error/response-error.js";
 import path from "path";
-import {uploadDirectory} from "../middleware/upload-middleware.js";
+import {uploadDirectory} from "../../middleware/v1/upload-middleware.js";
 import fs from "fs";
 
 const removeImageFromDirectory = (fileName) => {
@@ -106,10 +106,39 @@ const remove = async (carId) => {
     });
 }
 
+const get = async (carId) => {
+    carId = validate(getCarValidation, carId);
+    const carInDatabase = await prismaClient.car.findFirst({
+        where: {
+            id: carId,
+        },
+    });
+
+    if (!carInDatabase) {
+        throw new ResponseError(404, "car is not found");
+    }
+
+    return prismaClient.car.findMany({
+        where: {
+          id: carId,
+        },
+        select: {
+            id: true,
+            name: true,
+            cost_per_day: true,
+            size: true,
+            image: true,
+            updated_at: true,
+        }
+    });
+
+}
+
 
 export default {
     create,
     list,
     update,
     remove,
+    get,
 }
