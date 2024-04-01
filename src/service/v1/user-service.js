@@ -1,15 +1,27 @@
-import {validate} from "../../validation/v1/validation.js";
-import {
+// import {validate} from "../../validation/v1/validation.js";
+// import {
+//     getUserValidation,
+//     loginUserValidation,
+//     registerUserValidation,
+//     updateUserValidation
+// } from "../../validation/v1/user-validation.js";
+// import {prismaClient} from "../../application/database.js";
+// import {ResponseError} from "../../error/response-error.js";
+// import bcrypt from "bcrypt";
+// import {v4 as uuid} from "uuid";
+
+const { validate } = require("../../validation/v1/validation.js");
+const {
     getUserValidation,
     loginUserValidation,
     registerUserValidation,
     updateUserValidation
-} from "../../validation/v1/user-validation.js";
-import {prismaClient} from "../../application/database.js";
-import {ResponseError} from "../../error/response-error.js";
-import bcrypt from "bcrypt";
-import {v4 as uuid} from "uuid";
-import {request} from "express";
+} = require("../../validation/v1/user-validation.js");
+const { prismaClient } = require("../../application/database.js");
+const { ResponseError } = require("../../error/response-error.js");
+const bcrypt = require("bcrypt");
+const uuid = require("uuid").v4;
+
 
 const register = async (request) => {
     const user = validate(registerUserValidation, request);
@@ -185,7 +197,16 @@ const createAdmin = async (request) => {
     })
 }
 
-export default {
+// export default {
+//     register,
+//     login,
+//     get,
+//     update,
+//     logout,
+//     createAdmin,
+// }
+
+module.exports = {
     register,
     login,
     get,

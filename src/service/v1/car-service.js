@@ -1,10 +1,10 @@
-import {validate} from "../../validation/v1/validation.js";
-import {createCarValidation, getCarValidation, updateCarValidation} from "../../validation/v1/car-validation.js";
-import {prismaClient} from "../../application/database.js";
-import {ResponseError} from "../../error/response-error.js";
-import path from "path";
-import {uploadDirectory} from "../../middleware/v1/upload-middleware.js";
-import fs from "fs";
+const { validate } = require("../../validation/v1/validation.js");
+const { createCarValidation, getCarValidation, updateCarValidation } = require("../../validation/v1/car-validation.js");
+const { prismaClient } = require("../../application/database.js");
+const { ResponseError } = require("../../error/response-error.js");
+const path = require("path");
+const { uploadDirectory } = require("../../middleware/v1/upload-middleware.js");
+const fs = require("fs");
 
 const removeImageFromDirectory = (fileName) => {
     const filteredImageUrl = fileName.replace('/public/uploads/', '');
@@ -14,7 +14,6 @@ const removeImageFromDirectory = (fileName) => {
         fs.unlinkSync(filePath);
     }
 }
-
 
 const create = async (request) => {
     const car = validate(createCarValidation, request.body);
@@ -120,7 +119,7 @@ const get = async (carId) => {
 
     return prismaClient.car.findMany({
         where: {
-          id: carId,
+            id: carId,
         },
         select: {
             id: true,
@@ -131,14 +130,12 @@ const get = async (carId) => {
             updated_at: true,
         }
     });
-
 }
 
-
-export default {
+module.exports = {
     create,
     list,
     update,
     remove,
     get,
-}
+};

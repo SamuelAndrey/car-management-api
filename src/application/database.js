@@ -1,7 +1,7 @@
-import {PrismaClient} from "@prisma/client";
-import {logger} from "./logging.js";
+const { PrismaClient } = require("@prisma/client");
+const { logger } = require("./logging.js");
 
-export const prismaClient = new PrismaClient({
+const prismaClient = new PrismaClient({
     log: [
         {
             emit: 'event',
@@ -37,3 +37,7 @@ prismaClient.$on('info', (e) => {
 prismaClient.$on('query', (e) => {
     logger.info(e);
 });
+
+module.exports = {
+    prismaClient
+};

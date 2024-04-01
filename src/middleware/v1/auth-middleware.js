@@ -1,4 +1,4 @@
-import { prismaClient } from "../../application/database.js";
+const { prismaClient } = require("../../application/database.js");
 
 const handleUnauthorized = (res) => {
     res.status(401).json({
@@ -13,9 +13,9 @@ const isUser = (user, req, res, next) => {
         req.user = user;
         next();
     }
-}
+};
 
-export const authMiddleware = async (request, response, next) => {
+const authMiddleware = async (request, response, next) => {
     const token = request.get("Authorization");
 
     if (!token) {
@@ -31,7 +31,7 @@ export const authMiddleware = async (request, response, next) => {
     }
 };
 
-export const isSuperAdminMiddleware = async (request, response, next) => {
+const isSuperAdminMiddleware = async (request, response, next) => {
     const token = request.get("Authorization");
 
     if (!token) {
@@ -48,7 +48,7 @@ export const isSuperAdminMiddleware = async (request, response, next) => {
     }
 };
 
-export const isAdminOrSuperAdminMiddleware = async (request, response, next) => {
+const isAdminOrSuperAdminMiddleware = async (request, response, next) => {
     const token = request.get("Authorization");
 
     if (!token) {
@@ -66,4 +66,10 @@ export const isAdminOrSuperAdminMiddleware = async (request, response, next) => 
 
         isUser(user, request, response, next);
     }
+};
+
+module.exports = {
+    authMiddleware,
+    isSuperAdminMiddleware,
+    isAdminOrSuperAdminMiddleware
 };

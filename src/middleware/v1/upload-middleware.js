@@ -1,14 +1,8 @@
-import multer from "multer";
-import fs from "fs";
-import path from "path";
-// const __dirname = new URL('.', import.meta.url).pathname;
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-export const uploadDirectory = path.join(__dirname, "../../../public/uploads");
+const uploadDirectory = path.join(__dirname, "../../../public/uploads");
 
 if (!fs.existsSync(uploadDirectory)) {
     fs.mkdirSync(uploadDirectory, { recursive: true });
@@ -24,4 +18,9 @@ const storage = multer.diskStorage({
     }
 });
 
-export const upload = multer({ storage });
+const upload = multer({ storage });
+
+module.exports = {
+    upload,
+    uploadDirectory,
+};

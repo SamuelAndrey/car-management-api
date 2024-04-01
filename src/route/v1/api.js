@@ -1,15 +1,15 @@
-import express from "express";
-import {
+const express = require("express");
+const {
     authMiddleware,
     isAdminOrSuperAdminMiddleware,
     isSuperAdminMiddleware
-} from "../../middleware/v1/auth-middleware.js";
-import userController from "../../controller/v1/user-controller.js";
-import carController from "../../controller/v1/car-controller.js";
-import {upload} from "../../middleware/v1/upload-middleware.js";
+} = require("../../middleware/v1/auth-middleware.js");
+const userController = require("../../controller/v1/user-controller.js");
+const carController = require("../../controller/v1/car-controller.js");
+const { upload } = require("../../middleware/v1/upload-middleware.js");
+
 
 const userRouter = express.Router();
-// userRouter.use(authMiddleware);
 
 // user router
 userRouter.get("/api/v1/users/current", authMiddleware, userController.get);
@@ -24,6 +24,4 @@ userRouter.put("/api/v1/cars", upload.single("file"), carController.update);
 userRouter.delete("/api/v1/cars/:carId", carController.remove);
 userRouter.get("/api/v1/cars/:carId", carController.get);
 
-export {
-    userRouter,
-}
+module.exports = userRouter;

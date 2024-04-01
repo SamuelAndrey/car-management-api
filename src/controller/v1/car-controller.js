@@ -1,8 +1,15 @@
-import carService from "../../service/v1/car-service.js";
-import fs from "fs";
-import path from "path";
-import {uploadDirectory} from "../../middleware/v1/upload-middleware.js";
-import {logger} from "../../application/logging.js";
+// import carService from "../../service/v1/car-service.js";
+// import fs from "fs";
+// import path from "path";
+// import {uploadDirectory} from "../../middleware/v1/upload-middleware.js";
+// import {logger} from "../../application/logging.js";
+
+const carService = require("../../service/v1/car-service.js");
+const fs = require("fs");
+const path = require("path");
+const { uploadDirectory } = require("../../middleware/v1/upload-middleware.js");
+const { logger } = require("../../application/logging.js");
+
 
 const create = async (req, res, next) => {
     try {
@@ -86,10 +93,18 @@ const remove = async (req, res, next) => {
 }
 
 
-export default {
+// export default {
+//     create,
+//     list,
+//     update,
+//     remove,
+//     get,
+// }
+
+module.exports = {
     create,
     list,
     update,
     remove,
-    get,
+    get
 }

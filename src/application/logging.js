@@ -1,9 +1,14 @@
-import winston from "winston";
+// import winston from "winston";
+const {createLogger, format, transports} = require("winston");
 
-export const logger = winston.createLogger({
+const logger = createLogger({
    level: "info",
-   format: winston.format.json(),
+   format: format.json(),
    transports: [
-       new winston.transports.Console({})
+       new transports.Console({})
    ]
 });
+
+module.exports = {
+    logger
+};

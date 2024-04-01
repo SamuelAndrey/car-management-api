@@ -1,4 +1,4 @@
-import Joi from "joi";
+const Joi = require("joi");
 
 const createCarValidation = Joi.object({
     name: Joi.string().max(255).required(),
@@ -15,7 +15,13 @@ const updateCarValidation = Joi.object({
 
 const getCarValidation = Joi.number().positive().required();
 
-export {
+// export {
+//     createCarValidation,
+//     updateCarValidation,
+//     getCarValidation,
+// }
+
+module.exports = {
     createCarValidation,
     updateCarValidation,
     getCarValidation,

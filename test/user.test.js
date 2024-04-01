@@ -1,8 +1,8 @@
-import supertest from "supertest";
-import {web} from "../src/application/web.js";
-import {logger} from "../src/application/logging.js";
-import {createTestUser, createTestUserSuperAdmin, getTestUser, removeTestUser} from "./test-utils.js";
-import bcrypt from "bcrypt";
+const supertest = require("supertest");
+const web = require("../src/application/web.js");
+const {logger} = require("../src/application/logging.js");
+const {createTestUser, createTestUserSuperAdmin, getTestUser, removeTestUser} = require("./test-utils.js");
+const bcrypt = require("bcrypt");
 
 describe('POST /api/v1/users', function () {
 

@@ -13,7 +13,7 @@
   },
   "author": "Samuel Andrey",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^5.11.0",
     "bcrypt": "^5.1.1",
