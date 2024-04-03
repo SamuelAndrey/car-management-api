@@ -1,75 +1,75 @@
-const { prismaClient } = require("../../application/database.js");
+const { prismaClient } = require('../../application/database');
 
 const handleUnauthorized = (res) => {
-    res.status(401).json({
-        errors: "Unauthorized"
-    }).end();
+  res.status(401).json({
+    errors: 'Unauthorized',
+  }).end();
 };
 
 const isUser = (user, req, res, next) => {
-    if (!user) {
-        handleUnauthorized(res);
-    } else {
-        req.user = user;
-        next();
-    }
+  if (!user) {
+    handleUnauthorized(res);
+  } else {
+    req.user = user;
+    next();
+  }
 };
 
 const authMiddleware = async (request, response, next) => {
-    const token = request.get("Authorization");
+  const token = request.get('Authorization');
 
-    if (!token) {
-        handleUnauthorized(response);
-    } else {
-        const user = await prismaClient.user.findFirst({
-            where: {
-                token: token
-            }
-        });
+  if (!token) {
+    handleUnauthorized(response);
+  } else {
+    const user = await prismaClient.user.findFirst({
+      where: {
+        token,
+      },
+    });
 
-        isUser(user, request, response, next);
-    }
+    isUser(user, request, response, next);
+  }
 };
 
 const isSuperAdminMiddleware = async (request, response, next) => {
-    const token = request.get("Authorization");
+  const token = request.get('Authorization');
 
-    if (!token) {
-        handleUnauthorized(response);
-    } else {
-        const user = await prismaClient.user.findFirst({
-            where: {
-                token: token,
-                role: 'superadmin'
-            }
-        });
+  if (!token) {
+    handleUnauthorized(response);
+  } else {
+    const user = await prismaClient.user.findFirst({
+      where: {
+        token,
+        role: 'superadmin',
+      },
+    });
 
-        isUser(user, request, response, next);
-    }
+    isUser(user, request, response, next);
+  }
 };
 
 const isAdminOrSuperAdminMiddleware = async (request, response, next) => {
-    const token = request.get("Authorization");
+  const token = request.get('Authorization');
 
-    if (!token) {
-        handleUnauthorized(response);
-    } else {
-        const user = await prismaClient.user.findFirst({
-            where: {
-                token: token,
-                OR: [
-                    { role: "superadmin" },
-                    { role: "admin" }
-                ]
-            }
-        });
+  if (!token) {
+    handleUnauthorized(response);
+  } else {
+    const user = await prismaClient.user.findFirst({
+      where: {
+        token,
+        OR: [
+          { role: 'superadmin' },
+          { role: 'admin' },
+        ],
+      },
+    });
 
-        isUser(user, request, response, next);
-    }
+    isUser(user, request, response, next);
+  }
 };
 
 module.exports = {
-    authMiddleware,
-    isSuperAdminMiddleware,
-    isAdminOrSuperAdminMiddleware
+  authMiddleware,
+  isSuperAdminMiddleware,
+  isAdminOrSuperAdminMiddleware,
 };

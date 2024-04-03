@@ -1,6 +1,6 @@
-const web = require("./application/web");
-const {logger} = require('./application/logging.js');
+const web = require('./application/web');
+const { logger } = require('./application/logging');
 
 web.listen(3000, () => {
-    logger.info("App start");
-})
+  logger.info('App start');
+});

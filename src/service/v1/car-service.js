@@ -1,141 +1,139 @@
-const { validate } = require("../../validation/v1/validation.js");
-const { createCarValidation, getCarValidation, updateCarValidation } = require("../../validation/v1/car-validation.js");
-const { prismaClient } = require("../../application/database.js");
-const { ResponseError } = require("../../error/response-error.js");
-const path = require("path");
-const { uploadDirectory } = require("../../middleware/v1/upload-middleware.js");
-const fs = require("fs");
+const path = require('path');
+const fs = require('fs');
+const { validate } = require('../../validation/v1/validation');
+const { createCarValidation, getCarValidation, updateCarValidation } = require('../../validation/v1/car-validation');
+const { prismaClient } = require('../../application/database');
+const { ResponseError } = require('../../error/response-error');
+const { uploadDirectory } = require('../../middleware/v1/upload-middleware');
 
 const removeImageFromDirectory = (fileName) => {
-    const filteredImageUrl = fileName.replace('/public/uploads/', '');
-    const filePath = path.join(uploadDirectory, filteredImageUrl);
+  const filteredImageUrl = fileName.replace('/public/uploads/', '');
+  const filePath = path.join(uploadDirectory, filteredImageUrl);
 
-    if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-    }
-}
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+};
 
 const create = async (request) => {
-    const car = validate(createCarValidation, request.body);
+  const car = validate(createCarValidation, request.body);
 
-    car.image = '/public/uploads/' + request.file.filename;
-    car.cost_per_day = parseInt(car.cost_per_day);
+  car.image = `/public/uploads/${request.file.filename}`;
+  car.cost_per_day = parseInt(car.cost_per_day, 10);
 
-    return prismaClient.car.create({
-        data: car,
-        select: {
-            id: true,
-            name: true,
-            cost_per_day: true,
-            size: true,
-            image: true,
-            updated_at: true,
-        }
-    });
+  return prismaClient.car.create({
+    data: car,
+    select: {
+      id: true,
+      name: true,
+      cost_per_day: true,
+      size: true,
+      image: true,
+      updated_at: true,
+    },
+  });
 };
 
-const list = async () => {
-    return prismaClient.car.findMany({
-        select: {
-            id: true,
-            name: true,
-            cost_per_day: true,
-            size: true,
-            image: true,
-            updated_at: true,
-        }
-    });
-};
+const list = async () => prismaClient.car.findMany({
+  select: {
+    id: true,
+    name: true,
+    cost_per_day: true,
+    size: true,
+    image: true,
+    updated_at: true,
+  },
+});
 
 const update = async (request) => {
-    const car = validate(updateCarValidation, request.body);
+  const car = validate(updateCarValidation, request.body);
 
-    car.cost_per_day = parseInt(car.cost_per_day);
+  car.cost_per_day = parseInt(car.cost_per_day, 10);
 
-    const carInDatabase = await prismaClient.car.findFirst({
-        where: {
-            id: car.id,
-        },
-    });
+  const carInDatabase = await prismaClient.car.findFirst({
+    where: {
+      id: car.id,
+    },
+  });
 
-    if (!carInDatabase) {
-        throw new ResponseError(404, "car is not found");
-    }
+  if (!carInDatabase) {
+    throw new ResponseError(404, 'car is not found');
+  }
 
-    const data = { ...car };
+  const data = { ...car };
 
-    if (request.file) {
-        removeImageFromDirectory(carInDatabase.image);
-        data.image = '/public/uploads/' + request.file.filename;
-    }
+  if (request.file) {
+    removeImageFromDirectory(carInDatabase.image);
+    data.image = `/public/uploads/${request.file.filename}`;
+  }
 
-    return prismaClient.car.update({
-        where: {
-            id: car.id,
-        },
-        data: data,
-        select: {
-            id: true,
-            name: true,
-            cost_per_day: true,
-            size: true,
-            image: true
-        }
-    });
+  return prismaClient.car.update({
+    where: {
+      id: car.id,
+    },
+    data,
+    select: {
+      id: true,
+      name: true,
+      cost_per_day: true,
+      size: true,
+      image: true,
+    },
+  });
 };
 
 const remove = async (carId) => {
-    carId = validate(getCarValidation, carId);
-    const carInDatabase = await prismaClient.car.findFirst({
-        where: {
-            id: carId,
-        },
-    });
+  const validatedCarId = validate(getCarValidation, carId);
+  const carInDatabase = await prismaClient.car.findFirst({
+    where: {
+      id: validatedCarId,
+    },
+  });
 
-    if (!carInDatabase) {
-        throw new ResponseError(404, "car is not found");
-    }
+  if (!carInDatabase) {
+    throw new ResponseError(404, 'Car is not found');
+  }
 
-    removeImageFromDirectory(carInDatabase.image);
+  removeImageFromDirectory(carInDatabase.image);
 
-    return prismaClient.car.delete({
-        where: {
-            id: carId
-        }
-    });
-}
+  return prismaClient.car.delete({
+    where: {
+      id: validatedCarId,
+    },
+  });
+};
 
 const get = async (carId) => {
-    carId = validate(getCarValidation, carId);
-    const carInDatabase = await prismaClient.car.findFirst({
-        where: {
-            id: carId,
-        },
-    });
+  const validatedCarId = validate(getCarValidation, carId);
+  const carInDatabase = await prismaClient.car.findFirst({
+    where: {
+      id: validatedCarId,
+    },
+  });
 
-    if (!carInDatabase) {
-        throw new ResponseError(404, "car is not found");
-    }
+  if (!carInDatabase) {
+    throw new ResponseError(404, 'car is not found');
+  }
 
-    return prismaClient.car.findMany({
-        where: {
-            id: carId,
-        },
-        select: {
-            id: true,
-            name: true,
-            cost_per_day: true,
-            size: true,
-            image: true,
-            updated_at: true,
-        }
-    });
-}
+  return prismaClient.car.findMany({
+    where: {
+      id: validatedCarId,
+    },
+    select: {
+      id: true,
+      name: true,
+      cost_per_day: true,
+      size: true,
+      image: true,
+      updated_at: true,
+    },
+  });
+};
 
 module.exports = {
-    create,
-    list,
-    update,
-    remove,
-    get,
+  create,
+  list,
+  update,
+  remove,
+  get,
 };

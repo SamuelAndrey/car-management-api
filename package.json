@@ -4,12 +4,17 @@
   "description": "back end car management",
   "main": "src/main.js",
   "scripts": {
-    "test": "jest -i"
+    "test": "jest -i",
+    "lint": "eslint ./src --fix",
+    "start": "nodemon ./src/main.js"
   },
   "jest": {
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     }
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "author": "Samuel Andrey",
   "license": "ISC",
@@ -32,7 +37,11 @@
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^9.0.8",
     "babel-jest": "^29.7.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
     "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
     "prisma": "^5.11.0"
   }
 }
