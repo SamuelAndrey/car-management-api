@@ -18,7 +18,7 @@ const removeImageFromDirectory = (fileName) => {
 const create = async (request) => {
   const car = validate(createCarValidation, request.body);
 
-  car.image = `/public/uploads/${request.file.filename}`;
+  car.image = request.file.filename;
   car.cost_per_day = parseInt(car.cost_per_day, 10);
 
   return prismaClient.car.create({
@@ -64,7 +64,7 @@ const update = async (request) => {
 
   if (request.file) {
     removeImageFromDirectory(carInDatabase.image);
-    data.image = `/public/uploads/${request.file.filename}`;
+    data.image = request.file.filename;
   }
 
   return prismaClient.car.update({

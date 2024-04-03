@@ -2,11 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const carService = require('../../service/v1/car-service');
 const { uploadDirectory } = require('../../middleware/v1/upload-middleware');
+const { fileUploadPath } = require('../../utils/path');
+
+const fileToURL = (req, filename) => `${req.protocol}://${req.get('host')}${fileUploadPath}${filename}`;
 
 const create = async (req, res, next) => {
   try {
     const result = await carService.create(req);
-    result.image = `${req.protocol}://${req.get('host')}${result.image}`;
+    result.image = fileToURL(req, result.image);
     res.status(201).json({
       data: result,
     });
@@ -22,7 +25,7 @@ const create = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const result = await carService.update(req);
-    result.image = `${req.protocol}://${req.get('host')}${result.image}`;
+    result.image = fileToURL(req, result.image);
     res.status(201).json({
       data: result,
     });
@@ -39,7 +42,7 @@ const list = async (req, res, next) => {
       name: car.name,
       cost_per_day: car.cost_per_day,
       size: car.size,
-      image: `${req.protocol}://${req.get('host')}${car.image}`,
+      image: fileToURL(req, car.image),
       updated_at: car.updated_at,
     }));
     res.status(200).json({
